@@ -6,6 +6,13 @@ Production-grade AWS Lakehouse that ingests raw e-commerce transactional data fr
 
 ## Architecture
 
+![Lakehouse Architecture](docs/architecture.png)
+
+> Regenerate with: `python scripts/generate_architecture_diagram.py`
+
+<details>
+<summary>ASCII fallback</summary>
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │  Local                                                                          │
@@ -50,6 +57,8 @@ Production-grade AWS Lakehouse that ingests raw e-commerce transactional data fr
 │    (Delta tables, ACID)                                                         │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 ---
 
