@@ -8,8 +8,6 @@ Production-grade AWS Lakehouse that ingests raw e-commerce transactional data fr
 
 ![Lakehouse Architecture](docs/architecture.png)
 
-> Regenerate with: `python scripts/generate_architecture_diagram.py`
-
 <details>
 <summary>ASCII fallback</summary>
 
