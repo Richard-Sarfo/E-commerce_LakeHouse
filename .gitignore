@@ -1,0 +1,31 @@
+# Data files (never commit raw source data)
+Data/
+data_csv/
+*.xlsx
+*.xls
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+tfplan.bin
+.terraform.lock.hcl
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+.env
+*.pem
