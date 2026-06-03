@@ -192,12 +192,49 @@ Open the AWS Athena console, select the workgroup `lh-dev-lakehouse`, and run an
 
 ## Running Tests Locally
 
+The test suite spins up a real PySpark + Delta Lake session against the validation and Delta-merge code. No AWS credentials are required — everything runs against a local SparkSession.
+
+### Option A — Docker (recommended)
+
+`Dockerfile.test` pins a known-good combination (Apache Spark 3.5.0 image + PySpark 3.5.0 + delta-spark 3.1.0 + pytest), avoiding the Python/Java/Spark version juggling that bites locally on Windows.
+
+```bash
+docker build -f Dockerfile.test -t p2-test .
+docker run --rm -v "${PWD}:/work" -w /work --entrypoint python3 p2-test \
+  -m pytest tests/ -v
+```
+
+Expected output:
+
+```
+================================ test session starts ================================
+collected 11 items
+
+tests/test_delta_io.py::TestWriteDeltaMerge::test_initial_write_creates_delta_table  PASSED
+tests/test_delta_io.py::TestWriteDeltaMerge::test_merge_updates_existing_row         PASSED
+tests/test_delta_io.py::TestWriteDeltaMerge::test_merge_inserts_new_row              PASSED
+tests/test_delta_io.py::TestWriteDeltaMerge::test_partitioned_write                  PASSED
+tests/test_validation.py::TestValidateNulls::test_rejects_null_pk                    PASSED
+tests/test_validation.py::TestValidateNulls::test_passes_non_null_pk                 PASSED
+tests/test_validation.py::TestValidateTimestamps::test_rejects_unparseable_timestamp PASSED
+tests/test_validation.py::TestValidateTimestamps::test_skips_when_no_ts_col          PASSED
+tests/test_validation.py::TestValidateNonNegative::test_rejects_negative_amount      PASSED
+tests/test_validation.py::TestDeduplicate::test_keeps_latest_by_timestamp            PASSED
+tests/test_validation.py::TestDeduplicate::test_no_duplicates_unchanged              PASSED
+
+================================== 11 passed ==================================
+```
+
+### Option B — Native install
+
+Requires Python 3.8–3.11 (PySpark 3.5 doesn't support 3.12+) and a JDK 8/11/17 on `PATH`.
+
 ```bash
 pip install pyspark==3.5.0 delta-spark==3.1.0 pytest ruff
 pytest tests/ -v
 ```
 
-No AWS credentials are required — tests use a local SparkSession.
+> **Windows note:** if `SPARK_HOME` is set to a system Spark install, unset it (`Remove-Item Env:SPARK_HOME`) so PySpark uses its bundled JARs and doesn't mix versions.
 
 ---
 
