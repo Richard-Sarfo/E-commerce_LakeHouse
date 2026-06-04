@@ -14,7 +14,7 @@ locals {
     "--enable-continuous-cloudwatch-log" = "true"
     "--job-language"                     = "python"
     "--datalake-formats"                 = "delta"          # enables Delta Lake on Glue 4.0
-    "--extra-py-files"                   = "s3://${aws_s3_bucket.data.id}/glue-scripts/lib/__init__.py,s3://${aws_s3_bucket.data.id}/glue-scripts/lib/config.py,s3://${aws_s3_bucket.data.id}/glue-scripts/lib/validation.py,s3://${aws_s3_bucket.data.id}/glue-scripts/lib/delta_io.py"
+    "--extra-py-files"                   = "s3://${aws_s3_bucket.data.id}/${aws_s3_object.lib_zip.key}"
     "--processed_root"                   = local.processed_root
     "--rejected_root"                    = local.rejected_root
   }

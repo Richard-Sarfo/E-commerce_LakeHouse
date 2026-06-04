@@ -48,31 +48,34 @@ resource "aws_s3_object" "archive_script" {
   etag   = filemd5("${path.module}/../glue_jobs/archive_files.py")
 }
 
-# Upload lib modules so Glue workers can import them
-resource "aws_s3_object" "lib_config" {
-  bucket = aws_s3_bucket.data.id
-  key    = "glue-scripts/lib/config.py"
-  source = "${path.module}/../glue_jobs/lib/config.py"
-  etag   = filemd5("${path.module}/../glue_jobs/lib/config.py")
+# Package the lib/ Python module as a zip so Glue's --extra-py-files
+# preserves the package structure (individual .py files would each become
+# top-level imports, breaking `from lib.config import ...`).
+data "archive_file" "lib_zip" {
+  type        = "zip"
+  output_path = "${path.module}/.lib.zip"
+
+  source {
+    content  = file("${path.module}/../glue_jobs/lib/__init__.py")
+    filename = "lib/__init__.py"
+  }
+  source {
+    content  = file("${path.module}/../glue_jobs/lib/config.py")
+    filename = "lib/config.py"
+  }
+  source {
+    content  = file("${path.module}/../glue_jobs/lib/validation.py")
+    filename = "lib/validation.py"
+  }
+  source {
+    content  = file("${path.module}/../glue_jobs/lib/delta_io.py")
+    filename = "lib/delta_io.py"
+  }
 }
 
-resource "aws_s3_object" "lib_validation" {
+resource "aws_s3_object" "lib_zip" {
   bucket = aws_s3_bucket.data.id
-  key    = "glue-scripts/lib/validation.py"
-  source = "${path.module}/../glue_jobs/lib/validation.py"
-  etag   = filemd5("${path.module}/../glue_jobs/lib/validation.py")
-}
-
-resource "aws_s3_object" "lib_delta_io" {
-  bucket = aws_s3_bucket.data.id
-  key    = "glue-scripts/lib/delta_io.py"
-  source = "${path.module}/../glue_jobs/lib/delta_io.py"
-  etag   = filemd5("${path.module}/../glue_jobs/lib/delta_io.py")
-}
-
-resource "aws_s3_object" "lib_init" {
-  bucket  = aws_s3_bucket.data.id
-  key     = "glue-scripts/lib/__init__.py"
-  content = ""
-  etag    = md5("")
+  key    = "glue-scripts/lib.zip"
+  source = data.archive_file.lib_zip.output_path
+  etag   = data.archive_file.lib_zip.output_md5
 }
