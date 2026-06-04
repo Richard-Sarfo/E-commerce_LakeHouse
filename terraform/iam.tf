@@ -82,6 +82,12 @@ data "aws_iam_policy_document" "sfn_permissions" {
     resources = ["${aws_s3_bucket.data.arn}/*"]
   }
   statement {
+    sid     = "S3BucketLevel"
+    effect  = "Allow"
+    actions = ["s3:ListBucket", "s3:GetBucketLocation"]
+    resources = [aws_s3_bucket.data.arn]
+  }
+  statement {
     sid     = "AthenaValidation"
     effect  = "Allow"
     actions = [

@@ -17,6 +17,7 @@ resource "aws_glue_catalog_table" "products" {
     "table_type"                 = "DELTA"
     "spark.sql.sources.provider" = "delta"
     "classification"             = "delta"
+    "path"                       = "${local.processed_root}/products/"
   }
 
   storage_descriptor {
@@ -59,6 +60,7 @@ resource "aws_glue_catalog_table" "orders" {
     "table_type"                 = "DELTA"
     "spark.sql.sources.provider" = "delta"
     "classification"             = "delta"
+    "path"                       = "${local.processed_root}/orders/"
   }
 
   storage_descriptor {
@@ -110,6 +112,7 @@ resource "aws_glue_catalog_table" "order_items" {
     "table_type"                 = "DELTA"
     "spark.sql.sources.provider" = "delta"
     "classification"             = "delta"
+    "path"                       = "${local.processed_root}/order_items/"
   }
 
   storage_descriptor {
