@@ -177,10 +177,19 @@ data "aws_iam_policy_document" "github_oidc_assume" {
       type        = "Federated"
       identifiers = [aws_iam_openid_connect_provider.github.arn]
     }
+    # Restrict to a specific repo + branch. Default github_repo="*/*"
+    # preserves the legacy permissive behaviour; setting it to
+    # "your-org/your-repo" pins the trust to that repository's main
+    # branch only — recommended for any non-throwaway deployment.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:*:ref:refs/heads/main"]
+      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
     }
   }
 }
