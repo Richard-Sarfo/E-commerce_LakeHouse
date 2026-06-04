@@ -1,0 +1,41 @@
+# Local pre-commit hooks — same checks CI runs, but at commit time so
+# failures don't require waiting for the PR pipeline.
+#
+# Install:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Run against everything: pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=2000"]
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: ["--allow-missing-credentials"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+        files: ^(glue_jobs|tests|scripts)/.*\.py$
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.96.1
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+        args:
+          - --tf-init-args=-backend=false
