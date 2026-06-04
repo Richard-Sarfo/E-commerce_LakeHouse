@@ -16,7 +16,7 @@ locals {
             States = {
               TransformProducts = {
                 Type     = "Task"
-                Resource = "arn:aws:states:::glue:startJobRun.sync:2"
+                Resource = "arn:aws:states:::glue:startJobRun.sync"
                 Parameters = {
                   JobName = aws_glue_job.transform.name
                   Arguments = {
@@ -51,7 +51,7 @@ locals {
             States = {
               TransformOrders = {
                 Type     = "Task"
-                Resource = "arn:aws:states:::glue:startJobRun.sync:2"
+                Resource = "arn:aws:states:::glue:startJobRun.sync"
                 Parameters = {
                   JobName = aws_glue_job.transform.name
                   Arguments = {
@@ -95,7 +95,7 @@ locals {
       # ── Step 2: order_items — requires products + orders to be present first ──
       TransformOrderItems = {
         Type     = "Task"
-        Resource = "arn:aws:states:::glue:startJobRun.sync:2"
+        Resource = "arn:aws:states:::glue:startJobRun.sync"
         Parameters = {
           JobName = aws_glue_job.transform.name
           Arguments = {
@@ -123,7 +123,7 @@ locals {
       # ── Step 3: archive raw files ─────────────────────────────────────────
       ArchiveFiles = {
         Type     = "Task"
-        Resource = "arn:aws:states:::glue:startJobRun.sync:2"
+        Resource = "arn:aws:states:::glue:startJobRun.sync"
         Parameters = {
           JobName = aws_glue_job.archive.name
           Arguments = {
