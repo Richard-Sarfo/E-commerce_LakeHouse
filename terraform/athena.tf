@@ -1,6 +1,7 @@
 resource "aws_athena_workgroup" "lakehouse" {
-  name        = "${local.name_prefix}-lakehouse"
-  description = "Athena workgroup for e-commerce lakehouse queries"
+  name          = "${local.name_prefix}-lakehouse"
+  description   = "Athena workgroup for e-commerce lakehouse queries"
+  force_destroy = var.environment != "prod"
 
   configuration {
     enforce_workgroup_configuration    = true
