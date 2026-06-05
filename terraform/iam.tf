@@ -207,21 +207,90 @@ resource "aws_iam_role" "github_actions" {
 }
 
 data "aws_iam_policy_document" "github_deploy" {
+  # Terraform state — the deploy role reads/writes the remote state file in
+  # the dedicated state bucket. The data bucket holds glue scripts and
+  # processed data; the deploy needs to read/write both for `aws s3 sync`.
   statement {
-    sid    = "TerraformState"
+    sid    = "TerraformStateAndDataBucket"
     effect = "Allow"
     actions = [
-      "s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:DeleteObject",
+      "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
+      "s3:ListBucket", "s3:GetBucketLocation",
     ]
     resources = [
       aws_s3_bucket.data.arn,
       "${aws_s3_bucket.data.arn}/*",
+      "arn:aws:s3:::lh-tfstate-*",
+      "arn:aws:s3:::lh-tfstate-*/*",
     ]
   }
+
+  # Bucket lifecycle — Terraform creates/destroys the data bucket and its
+  # configuration sub-resources (versioning, encryption, public-access block,
+  # event-bridge notification).
   statement {
-    sid       = "ManageInfra"
+    sid    = "ManageS3Buckets"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket", "s3:DeleteBucket",
+      "s3:GetBucket*", "s3:PutBucket*",
+      "s3:GetEncryptionConfiguration", "s3:PutEncryptionConfiguration",
+      "s3:GetLifecycleConfiguration", "s3:PutLifecycleConfiguration",
+    ]
+    resources = ["arn:aws:s3:::lh-*"]
+  }
+
+  # IAM — Terraform manages Glue, SFN, EventBridge service roles and
+  # this very deploy role. Scoped to the project naming convention.
+  statement {
+    sid    = "ManageIAMRoles"
+    effect = "Allow"
+    actions = [
+      "iam:CreateRole", "iam:DeleteRole", "iam:GetRole", "iam:UpdateRole",
+      "iam:UpdateAssumeRolePolicy", "iam:TagRole", "iam:UntagRole",
+      "iam:PutRolePolicy", "iam:DeleteRolePolicy", "iam:GetRolePolicy",
+      "iam:ListRolePolicies",
+      "iam:AttachRolePolicy", "iam:DetachRolePolicy",
+      "iam:ListAttachedRolePolicies", "iam:ListInstanceProfilesForRole",
+      "iam:PassRole",
+    ]
+    resources = [
+      "arn:aws:iam::${local.account_id}:role/lh-*",
+    ]
+  }
+
+  # IAM OIDC provider — read-only on the GitHub provider so plan can
+  # confirm it exists. Mutation is blocked by `prevent_destroy` and we
+  # don't grant Create/Delete here so even a compromised role can't
+  # tamper with the trust anchor.
+  statement {
+    sid    = "ReadOIDCProvider"
+    effect = "Allow"
+    actions = [
+      "iam:GetOpenIDConnectProvider", "iam:ListOpenIDConnectProviders",
+      "iam:TagOpenIDConnectProvider", "iam:UntagOpenIDConnectProvider",
+    ]
+    resources = ["*"]
+  }
+
+  # CloudWatch Logs — SFN log group and Glue continuous logging.
+  statement {
+    sid    = "ManageCloudWatchLogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup", "logs:DeleteLogGroup",
+      "logs:DescribeLogGroups", "logs:TagResource", "logs:UntagResource",
+      "logs:ListTagsForResource", "logs:PutRetentionPolicy",
+      "logs:DeleteRetentionPolicy",
+    ]
+    resources = ["*"]
+  }
+
+  # All the data-plane services Terraform creates and manages.
+  statement {
+    sid       = "ManageDataPlaneServices"
     effect    = "Allow"
-    actions   = ["glue:*", "states:*", "iam:PassRole", "events:*", "sns:*", "athena:*"]
+    actions   = ["glue:*", "states:*", "events:*", "sns:*", "athena:*"]
     resources = ["*"]
   }
 }

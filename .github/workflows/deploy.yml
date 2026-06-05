@@ -55,6 +55,16 @@ jobs:
         with:
           terraform_version: "~1.6"
 
+      - name: Verify backend config
+        run: |
+          if [ -z "$TF_STATE_BUCKET" ]; then
+            echo "::error::TF_STATE_BUCKET secret is empty. Set it to the S3 state bucket name (e.g. lh-tfstate-dev-<account>)."
+            exit 1
+          fi
+          echo "Backend: s3://${TF_STATE_BUCKET}/lakehouse/terraform.tfstate in ${AWS_REGION}"
+          aws s3 ls "s3://${TF_STATE_BUCKET}/lakehouse/terraform.tfstate" \
+            || { echo "::error::Backend state file not found at the location above. Check the bucket name and that the state has been migrated."; exit 1; }
+
       - name: Terraform init
         working-directory: terraform
         run: |
