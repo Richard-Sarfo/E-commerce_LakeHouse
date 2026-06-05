@@ -12,7 +12,6 @@ Glue job arguments:
 
 import logging
 import sys
-from datetime import datetime
 
 import boto3
 from awsglue.utils import getResolvedOptions

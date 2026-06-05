@@ -1,17 +1,12 @@
 """Unit tests for glue_jobs/lib/delta_io.py — write_delta_merge."""
 
 import sys
-import tempfile
 from pathlib import Path
-
-import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "glue_jobs"))
 
-from pyspark.sql.types import IntegerType, StringType, StructField, StructType
-
 from lib.delta_io import write_delta_merge
-
+from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
 PRODUCT_SCHEMA = StructType([
     StructField("product_id",    IntegerType(), True),

@@ -13,7 +13,7 @@ locals {
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
     "--job-language"                     = "python"
-    "--datalake-formats"                 = "delta"          # enables Delta Lake on Glue 4.0
+    "--datalake-formats"                 = "delta" # enables Delta Lake on Glue 4.0
     "--extra-py-files"                   = "s3://${aws_s3_bucket.data.id}/${aws_s3_object.lib_zip.key}"
     "--processed_root"                   = local.processed_root
     "--rejected_root"                    = local.rejected_root
@@ -28,10 +28,10 @@ resource "aws_glue_job" "transform" {
   glue_version      = "4.0"
   worker_type       = "G.1X"
   number_of_workers = 2
-  timeout           = 30  # minutes
+  timeout           = 30 # minutes
 
   execution_property {
-    max_concurrent_runs = 3  # products + orders + order_items can overlap
+    max_concurrent_runs = 3 # products + orders + order_items can overlap
   }
 
   command {
@@ -49,7 +49,7 @@ resource "aws_glue_job" "archive" {
   name         = "${local.name_prefix}-archive-files"
   role_arn     = aws_iam_role.glue.arn
   glue_version = "4.0"
-  max_capacity = 0.0625  # DPU for Python shell
+  max_capacity = 0.0625 # DPU for Python shell
 
   command {
     name            = "pythonshell"

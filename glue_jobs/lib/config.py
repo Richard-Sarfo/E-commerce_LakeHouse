@@ -12,7 +12,6 @@ from pyspark.sql.types import (
     StringType,
     StructField,
     StructType,
-    TimestampType,
 )
 
 # ---------------------------------------------------------------------------

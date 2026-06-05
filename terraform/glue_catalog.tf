@@ -22,37 +22,37 @@ locals {
   spark_schema_products = jsonencode({
     type = "struct"
     fields = [
-      { name = "product_id",    type = "integer", nullable = true, metadata = {} },
+      { name = "product_id", type = "integer", nullable = true, metadata = {} },
       { name = "department_id", type = "integer", nullable = true, metadata = {} },
-      { name = "department",    type = "string",  nullable = true, metadata = {} },
-      { name = "product_name",  type = "string",  nullable = true, metadata = {} },
+      { name = "department", type = "string", nullable = true, metadata = {} },
+      { name = "product_name", type = "string", nullable = true, metadata = {} },
     ]
   })
 
   spark_schema_orders = jsonencode({
     type = "struct"
     fields = [
-      { name = "order_num",       type = "long",          nullable = true, metadata = {} },
-      { name = "order_id",        type = "integer",       nullable = true, metadata = {} },
-      { name = "user_id",         type = "integer",       nullable = true, metadata = {} },
-      { name = "order_timestamp", type = "string",        nullable = true, metadata = {} },
-      { name = "total_amount",    type = "decimal(12,2)", nullable = true, metadata = {} },
-      { name = "date",            type = "string",        nullable = true, metadata = {} },
+      { name = "order_num", type = "long", nullable = true, metadata = {} },
+      { name = "order_id", type = "integer", nullable = true, metadata = {} },
+      { name = "user_id", type = "integer", nullable = true, metadata = {} },
+      { name = "order_timestamp", type = "string", nullable = true, metadata = {} },
+      { name = "total_amount", type = "decimal(12,2)", nullable = true, metadata = {} },
+      { name = "date", type = "string", nullable = true, metadata = {} },
     ]
   })
 
   spark_schema_order_items = jsonencode({
     type = "struct"
     fields = [
-      { name = "id",                     type = "long",    nullable = true, metadata = {} },
-      { name = "order_id",               type = "integer", nullable = true, metadata = {} },
-      { name = "user_id",                type = "integer", nullable = true, metadata = {} },
+      { name = "id", type = "long", nullable = true, metadata = {} },
+      { name = "order_id", type = "integer", nullable = true, metadata = {} },
+      { name = "user_id", type = "integer", nullable = true, metadata = {} },
       { name = "days_since_prior_order", type = "integer", nullable = true, metadata = {} },
-      { name = "product_id",             type = "integer", nullable = true, metadata = {} },
-      { name = "add_to_cart_order",      type = "integer", nullable = true, metadata = {} },
-      { name = "reordered",              type = "integer", nullable = true, metadata = {} },
-      { name = "order_timestamp",        type = "string",  nullable = true, metadata = {} },
-      { name = "date",                   type = "string",  nullable = true, metadata = {} },
+      { name = "product_id", type = "integer", nullable = true, metadata = {} },
+      { name = "add_to_cart_order", type = "integer", nullable = true, metadata = {} },
+      { name = "reordered", type = "integer", nullable = true, metadata = {} },
+      { name = "order_timestamp", type = "string", nullable = true, metadata = {} },
+      { name = "date", type = "string", nullable = true, metadata = {} },
     ]
   })
 

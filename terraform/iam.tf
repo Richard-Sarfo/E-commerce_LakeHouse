@@ -23,9 +23,9 @@ resource "aws_iam_role_policy_attachment" "glue_service" {
 
 data "aws_iam_policy_document" "glue_s3" {
   statement {
-    sid     = "BucketAccess"
-    effect  = "Allow"
-    actions = ["s3:ListBucket", "s3:GetBucketLocation"]
+    sid       = "BucketAccess"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
     resources = [aws_s3_bucket.data.arn]
   }
   statement {
@@ -37,9 +37,9 @@ data "aws_iam_policy_document" "glue_s3" {
     resources = ["${aws_s3_bucket.data.arn}/*"]
   }
   statement {
-    sid     = "CloudWatchMetrics"
-    effect  = "Allow"
-    actions = ["cloudwatch:PutMetricData"]
+    sid       = "CloudWatchMetrics"
+    effect    = "Allow"
+    actions   = ["cloudwatch:PutMetricData"]
     resources = ["*"]
   }
 }
@@ -70,26 +70,26 @@ resource "aws_iam_role" "sfn" {
 
 data "aws_iam_policy_document" "sfn_permissions" {
   statement {
-    sid     = "StartGlueJobs"
-    effect  = "Allow"
-    actions = ["glue:StartJobRun", "glue:GetJobRun", "glue:GetJobRuns", "glue:BatchStopJobRun"]
+    sid       = "StartGlueJobs"
+    effect    = "Allow"
+    actions   = ["glue:StartJobRun", "glue:GetJobRun", "glue:GetJobRuns", "glue:BatchStopJobRun"]
     resources = ["*"]
   }
   statement {
-    sid     = "S3Archive"
-    effect  = "Allow"
-    actions = ["s3:CopyObject", "s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
+    sid       = "S3Archive"
+    effect    = "Allow"
+    actions   = ["s3:CopyObject", "s3:DeleteObject", "s3:GetObject", "s3:PutObject"]
     resources = ["${aws_s3_bucket.data.arn}/*"]
   }
   statement {
-    sid     = "S3BucketLevel"
-    effect  = "Allow"
-    actions = ["s3:ListBucket", "s3:GetBucketLocation"]
+    sid       = "S3BucketLevel"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
     resources = [aws_s3_bucket.data.arn]
   }
   statement {
-    sid     = "AthenaValidation"
-    effect  = "Allow"
+    sid    = "AthenaValidation"
+    effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
       "athena:GetQueryExecution",
@@ -98,24 +98,24 @@ data "aws_iam_policy_document" "sfn_permissions" {
     resources = ["*"]
   }
   statement {
-    sid     = "GlueCatalogRead"
-    effect  = "Allow"
-    actions = ["glue:GetTable", "glue:GetDatabase"]
+    sid       = "GlueCatalogRead"
+    effect    = "Allow"
+    actions   = ["glue:GetTable", "glue:GetDatabase"]
     resources = ["*"]
   }
   statement {
-    sid     = "SNSPublish"
-    effect  = "Allow"
-    actions = ["sns:Publish"]
+    sid       = "SNSPublish"
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
     resources = [aws_sns_topic.alerts.arn]
   }
   statement {
-    sid     = "CloudWatchLogs"
-    effect  = "Allow"
+    sid    = "CloudWatchLogs"
+    effect = "Allow"
     actions = ["logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery",
-               "logs:DeleteLogDelivery", "logs:ListLogDeliveries",
-               "logs:PutResourcePolicy", "logs:DescribeResourcePolicies",
-               "logs:DescribeLogGroups"]
+      "logs:DeleteLogDelivery", "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy", "logs:DescribeResourcePolicies",
+    "logs:DescribeLogGroups"]
     resources = ["*"]
   }
 }
@@ -146,8 +146,8 @@ resource "aws_iam_role" "eventbridge" {
 
 data "aws_iam_policy_document" "eb_sfn" {
   statement {
-    effect  = "Allow"
-    actions = ["states:StartExecution"]
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
     resources = [aws_sfn_state_machine.lakehouse.arn]
   }
 }
@@ -161,8 +161,8 @@ resource "aws_iam_role_policy" "eb_sfn" {
 # ── GitHub Actions OIDC (no long-lived access keys in CI) ───────────────────
 
 resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
   thumbprint_list = [
     "6938fd4d98bab03faadb97b34396831e3780aea1",
     "1c58a3a8518e8759bf075b76b750d4f2df264fcd",
@@ -212,9 +212,9 @@ data "aws_iam_policy_document" "github_deploy" {
     ]
   }
   statement {
-    sid     = "ManageInfra"
-    effect  = "Allow"
-    actions = ["glue:*", "states:*", "iam:PassRole", "events:*", "sns:*", "athena:*"]
+    sid       = "ManageInfra"
+    effect    = "Allow"
+    actions   = ["glue:*", "states:*", "iam:PassRole", "events:*", "sns:*", "athena:*"]
     resources = ["*"]
   }
 }

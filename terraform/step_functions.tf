@@ -1,7 +1,7 @@
 locals {
   sfn_definition = jsonencode({
-    Comment = "E-commerce lakehouse ETL: validate, transform, merge, archive, verify"
-    StartAt = "TransformParallel"
+    Comment        = "E-commerce lakehouse ETL: validate, transform, merge, archive, verify"
+    StartAt        = "TransformParallel"
     TimeoutSeconds = 3600
 
     States = {
@@ -20,9 +20,9 @@ locals {
                 Parameters = {
                   JobName = aws_glue_job.transform.name
                   Arguments = {
-                    "--dataset"   = "products"
-                    "--input_s3"  = "s3://${aws_s3_bucket.data.id}/raw/products/products.csv"
-                    "--run_id.$"  = "$$.Execution.Name"
+                    "--dataset"  = "products"
+                    "--input_s3" = "s3://${aws_s3_bucket.data.id}/raw/products/products.csv"
+                    "--run_id.$" = "$$.Execution.Name"
                   }
                 }
                 TimeoutSeconds = 1800
@@ -55,9 +55,9 @@ locals {
                 Parameters = {
                   JobName = aws_glue_job.transform.name
                   Arguments = {
-                    "--dataset"   = "orders"
-                    "--input_s3"  = "s3://${aws_s3_bucket.data.id}/raw/orders/orders_apr_2025.csv"
-                    "--run_id.$"  = "$$.Execution.Name"
+                    "--dataset"  = "orders"
+                    "--input_s3" = "s3://${aws_s3_bucket.data.id}/raw/orders/orders_apr_2025.csv"
+                    "--run_id.$" = "$$.Execution.Name"
                   }
                 }
                 TimeoutSeconds = 1800
@@ -99,9 +99,9 @@ locals {
         Parameters = {
           JobName = aws_glue_job.transform.name
           Arguments = {
-            "--dataset"   = "order_items"
-            "--input_s3"  = "s3://${aws_s3_bucket.data.id}/raw/order_items/order_items_apr_2025.csv"
-            "--run_id.$"  = "$$.Execution.Name"
+            "--dataset"  = "order_items"
+            "--input_s3" = "s3://${aws_s3_bucket.data.id}/raw/order_items/order_items_apr_2025.csv"
+            "--run_id.$" = "$$.Execution.Name"
           }
         }
         TimeoutSeconds = 1800
@@ -127,7 +127,7 @@ locals {
         Parameters = {
           JobName = aws_glue_job.archive.name
           Arguments = {
-            "--raw_keys"      = "raw/products/products.csv,raw/orders/orders_apr_2025.csv,raw/order_items/order_items_apr_2025.csv"
+            "--raw_keys"       = "raw/products/products.csv,raw/orders/orders_apr_2025.csv,raw/order_items/order_items_apr_2025.csv"
             "--archive_date.$" = "$$.Execution.StartTime"
           }
         }
@@ -145,8 +145,8 @@ locals {
         Type     = "Task"
         Resource = "arn:aws:states:::athena:startQueryExecution.sync"
         Parameters = {
-          QueryString       = "SELECT COUNT(*) AS orders_count FROM ${aws_glue_catalog_database.lakehouse.name}.orders"
-          WorkGroup         = aws_athena_workgroup.lakehouse.name
+          QueryString = "SELECT COUNT(*) AS orders_count FROM ${aws_glue_catalog_database.lakehouse.name}.orders"
+          WorkGroup   = aws_athena_workgroup.lakehouse.name
           ResultConfiguration = {
             OutputLocation = "${local.athena_results}/validation/"
           }
@@ -187,8 +187,8 @@ locals {
 }
 
 resource "aws_sfn_state_machine" "lakehouse" {
-  name     = "${local.name_prefix}-lakehouse-pipeline"
-  role_arn = aws_iam_role.sfn.arn
+  name       = "${local.name_prefix}-lakehouse-pipeline"
+  role_arn   = aws_iam_role.sfn.arn
   definition = local.sfn_definition
 
   logging_configuration {

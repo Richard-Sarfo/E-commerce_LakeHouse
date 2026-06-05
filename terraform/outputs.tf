@@ -25,7 +25,7 @@ output "github_actions_role_arn" {
 
 output "manual_trigger_command" {
   description = "AWS CLI command to manually trigger the pipeline for a demo run"
-  value = <<-EOT
+  value       = <<-EOT
     aws stepfunctions start-execution \
       --state-machine-arn ${aws_sfn_state_machine.lakehouse.arn} \
       --input '{"bucket":"${aws_s3_bucket.data.id}","key":"raw/orders/orders_apr_2025.csv"}'

@@ -7,15 +7,13 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "glue_jobs"))
 
-from pyspark.sql import functions as F
-from pyspark.sql.types import IntegerType, StringType, StructField, StructType
-
 from lib.validation import (
     deduplicate,
     validate_non_negative,
     validate_nulls,
     validate_timestamps,
 )
+from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
 
 @pytest.fixture()

@@ -22,11 +22,10 @@ import sys
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
-
 from lib.config import DATASETS, SCHEMAS
 from lib.delta_io import emit_cloudwatch_metrics, write_delta_merge, write_rejected
 from lib.validation import run_all_validations
+from pyspark.context import SparkContext
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
