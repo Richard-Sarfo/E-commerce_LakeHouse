@@ -207,37 +207,24 @@ resource "aws_iam_role" "github_actions" {
 }
 
 data "aws_iam_policy_document" "github_deploy" {
-  # Terraform state — the deploy role reads/writes the remote state file in
-  # the dedicated state bucket. The data bucket holds glue scripts and
-  # processed data; the deploy needs to read/write both for `aws s3 sync`.
+  # S3 — full access scoped to our own buckets (data + state).
+  #
+  # We intentionally use s3:* rather than an enumerated allow-list. Terraform's
+  # AWS provider reads every bucket sub-attribute on `plan` — accelerate,
+  # replication, intelligent-tiering, analytics, metrics, inventory,
+  # ownership-controls, request-payment, and more — and AWS's IAM action
+  # naming is inconsistent (some end with `Configuration`, others with
+  # `BucketConfiguration`). Wildcarding the catalog is operationally cheaper
+  # than maintaining the list, and the resource-ARN scope (`lh-*`) keeps the
+  # blast radius bounded: this role still can't touch any non-project bucket.
   statement {
-    sid    = "TerraformStateAndDataBucket"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
-      "s3:ListBucket", "s3:GetBucketLocation",
-    ]
+    sid     = "ManageProjectBuckets"
+    effect  = "Allow"
+    actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.data.arn,
-      "${aws_s3_bucket.data.arn}/*",
-      "arn:aws:s3:::lh-tfstate-*",
-      "arn:aws:s3:::lh-tfstate-*/*",
+      "arn:aws:s3:::lh-*",
+      "arn:aws:s3:::lh-*/*",
     ]
-  }
-
-  # Bucket lifecycle — Terraform creates/destroys the data bucket and its
-  # configuration sub-resources (versioning, encryption, public-access block,
-  # event-bridge notification).
-  statement {
-    sid    = "ManageS3Buckets"
-    effect = "Allow"
-    actions = [
-      "s3:CreateBucket", "s3:DeleteBucket",
-      "s3:GetBucket*", "s3:PutBucket*",
-      "s3:GetEncryptionConfiguration", "s3:PutEncryptionConfiguration",
-      "s3:GetLifecycleConfiguration", "s3:PutLifecycleConfiguration",
-    ]
-    resources = ["arn:aws:s3:::lh-*"]
   }
 
   # IAM — Terraform manages Glue, SFN, EventBridge service roles and
