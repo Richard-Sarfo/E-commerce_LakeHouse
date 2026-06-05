@@ -11,6 +11,13 @@ terraform {
       version = "~> 2.4"
     }
   }
+
+  # Partial backend config — `bucket`, `key`, `region` are supplied at init
+  # time via `-backend-config=` flags (see .github/workflows/deploy.yml and
+  # the Makefile). This declaration is required so the flags are actually
+  # honoured; without it Terraform silently falls back to local state and
+  # every CI run starts from scratch.
+  backend "s3" {}
 }
 
 provider "aws" {

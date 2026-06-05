@@ -167,6 +167,13 @@ resource "aws_iam_openid_connect_provider" "github" {
     "6938fd4d98bab03faadb97b34396831e3780aea1",
     "1c58a3a8518e8759bf075b76b750d4f2df264fcd",
   ]
+
+  # Bootstrap resource — without it GitHub Actions cannot assume any role.
+  # Block accidental destruction so `make tf-destroy` doesn't break the
+  # deploy workflow's ability to re-create everything else.
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "aws_iam_policy_document" "github_oidc_assume" {
